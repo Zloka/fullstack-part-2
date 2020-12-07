@@ -25,7 +25,10 @@ const App = () => {
           ? numCountries >= 10
             ? <div>Too many matches, specify another filter</div>
             : numCountries > 1
-              ? filteredCountries.map(country => <div key={country.name}>{country.name}</div>)
+              ? filteredCountries.map(country => <div key={country.name}>
+                {country.name}
+                <button onClick={() => setSearch(country.name)}>show</button>
+                </div>)
               : numCountries === 1
                 ? <Country country={filteredCountries[0]} />
                 : <div>No countries found, try another filter.</div>
