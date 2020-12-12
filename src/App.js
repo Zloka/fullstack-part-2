@@ -33,7 +33,10 @@ const App = () => {
         setNewName('');
         setNewNumber('');
         showNotification(`Updated ${personObject.name}'s entry in the phonebook!`, true);
-      }).catch(error => console.log(error));
+      }).catch(() => {
+        showNotification(`${personObject.name}'s entry no longer exists in the phonebook!`, false);
+        setPersons(persons.filter(person => person.id !== possiblyExistingPerson.id));
+      });
     } else if (persons.some(person => person.number === newNumber)) {
       window.alert(`The number ${newNumber} is already in the phonebook!`);
     } else if (!possiblyExistingPerson) {
