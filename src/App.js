@@ -17,12 +17,18 @@ const App = () => {
 
   const handleAddPerson = (event) => {
     event.preventDefault();
-    if (persons.some(person => person.name === newName)) {
-      window.alert(`${newName} is already in the phonebook!`);
+    const possiblyExistingPerson = persons.find(person => person.name.toLowerCase() === newName.toLowerCase());
+    const personObject = { name: newName, number: newNumber }
+    if (possiblyExistingPerson && window.confirm(`${possiblyExistingPerson.name} already exists in the phonebook, would you like to update their number?`)) {
+      personService.update(possiblyExistingPerson.id, personObject).then(updatedPerson => {
+        setPersons(persons.map(person => person.id === possiblyExistingPerson.id ? updatedPerson : person));
+        setNewName('');
+        setNewNumber('');
+      }).catch(error => console.log(error));
     } else if (persons.some(person => person.number === newNumber)) {
       window.alert(`The number ${newNumber} is already in the phonebook!`);
-    } else {
-      personService.create({ name: newName, number: newNumber })
+    } else if (!possiblyExistingPerson) {
+      personService.create(personObject)
         .then((createdPerson) => {
           setPersons(persons.concat(createdPerson));
           setNewName('');
