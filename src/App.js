@@ -1,19 +1,27 @@
 import React, { useEffect, useState } from 'react'
-import axios from 'axios';
 import Filter from './Filter';
 import PersonForm from './PersonForm';
 import Persons from './Persons';
 import personService from './network/personService';
+import Notification from './Notification';
 
 const App = () => {
   const [ persons, setPersons ] = useState([]); 
   const [ newName, setNewName ] = useState('')
   const [newNumber, setNewNumber] = useState('');
   const [filter, setFilter] = useState('');
+  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
     personService.getAll().then(retrievedPersons => setPersons(retrievedPersons)).catch(error => console.log(error));
   }, []);
+
+  const showNotification = (message, success) => {
+    setNotification({ message, success });
+    setTimeout(() => {
+      setNotification(null);
+    }, 5 * 1000);
+  }
 
   const handleAddPerson = (event) => {
     event.preventDefault();
@@ -24,6 +32,7 @@ const App = () => {
         setPersons(persons.map(person => person.id === possiblyExistingPerson.id ? updatedPerson : person));
         setNewName('');
         setNewNumber('');
+        showNotification(`Updated ${personObject.name}'s entry in the phonebook!`, true);
       }).catch(error => console.log(error));
     } else if (persons.some(person => person.number === newNumber)) {
       window.alert(`The number ${newNumber} is already in the phonebook!`);
@@ -33,6 +42,7 @@ const App = () => {
           setPersons(persons.concat(createdPerson));
           setNewName('');
           setNewNumber('');
+          showNotification(`Added ${personObject.name} to the phonebook!`, true);
         })
         .catch(error => console.log(error));
     }
@@ -61,6 +71,7 @@ const App = () => {
 
   return (
     <div>
+      <Notification notification={notification} />
       <h2>Phonebook</h2>
       <Filter value={filter} onChange={handleFilterChange} />
       <h2>Add a new</h2>
