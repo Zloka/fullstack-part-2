@@ -44,6 +44,15 @@ const App = () => {
     setFilter(event.target.value)
   }
 
+  const handleRemovePerson = (id) => {
+    const personToRemove = persons.find(person => person.id === id);
+    if (personToRemove && window.confirm(`Would you really like to remove ${personToRemove.name} from the phonebook?`)) {
+      personService.remove(id).then(() => {
+        setPersons(persons.filter(person => person.id !== id));
+      }).catch(error => console.log(error));
+    }
+  }
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -51,7 +60,7 @@ const App = () => {
       <h2>Add a new</h2>
       <PersonForm onSubmit={handleAddPerson} onNameChange={handleNameChange} onNumberChange={handleNumberChange} name={newName} number={newNumber} />
       <h2>Numbers</h2>
-      <Persons filter={filter} persons={persons} />
+      <Persons onDeleteClick={handleRemovePerson} filter={filter} persons={persons} />
     </div>
   )
 }
