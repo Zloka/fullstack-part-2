@@ -3,6 +3,7 @@ import axios from 'axios';
 import Filter from './Filter';
 import PersonForm from './PersonForm';
 import Persons from './Persons';
+import personService from './network/personService';
 
 const App = () => {
   const [ persons, setPersons ] = useState([]); 
@@ -11,15 +12,8 @@ const App = () => {
   const [filter, setFilter] = useState('');
 
   useEffect(() => {
-    axios.get('http://localhost:3001/persons').then(resp => {
-      setPersons(resp.data);
-    })
+    personService.getAll().then(retrievedPersons => setPersons(retrievedPersons)).catch(error => console.log(error));
   }, []);
-
-  const postNewPerson = (personObject) => {
-    return axios
-    .post('http://localhost:3001/persons', personObject);
-  }
 
   const handleAddPerson = (event) => {
     event.preventDefault();
@@ -28,11 +22,13 @@ const App = () => {
     } else if (persons.some(person => person.number === newNumber)) {
       window.alert(`The number ${newNumber} is already in the phonebook!`);
     } else {
-      postNewPerson({ name: newName, number: newNumber }).then(response => {
-        setPersons(persons.concat(response.data));
-        setNewName('');
-        setNewNumber('');
-      });
+      personService.create({ name: newName, number: newNumber })
+        .then((createdPerson) => {
+          setPersons(persons.concat(createdPerson));
+          setNewName('');
+          setNewNumber('');
+        })
+        .catch(error => console.log(error));
     }
   }
 
