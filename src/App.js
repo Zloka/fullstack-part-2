@@ -16,6 +16,11 @@ const App = () => {
     })
   }, []);
 
+  const postNewPerson = (personObject) => {
+    return axios
+    .post('http://localhost:3001/persons', personObject);
+  }
+
   const handleAddPerson = (event) => {
     event.preventDefault();
     if (persons.some(person => person.name === newName)) {
@@ -23,9 +28,11 @@ const App = () => {
     } else if (persons.some(person => person.number === newNumber)) {
       window.alert(`The number ${newNumber} is already in the phonebook!`);
     } else {
-      setPersons(persons.concat({ name: newName, number: newNumber }));
-      setNewName('');
-      setNewNumber('');
+      postNewPerson({ name: newName, number: newNumber }).then(response => {
+        setPersons(persons.concat(response.data));
+        setNewName('');
+        setNewNumber('');
+      });
     }
   }
 
